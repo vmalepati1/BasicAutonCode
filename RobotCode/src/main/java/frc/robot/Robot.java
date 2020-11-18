@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Drive Straight Heading P", 0.2);
     SmartDashboard.putNumber("Turn P", 0.05);
 
-    // CommandScheduler.getInstance().setDefaultCommand(drivetrain, new DriveCommand());
+    CommandScheduler.getInstance().setDefaultCommand(drivetrain, new DriveCommand());
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
   }
@@ -75,7 +75,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // Drives forward 2 meters and then turns 90 degrees
-    new SequentialCommandGroup(new DriveStraight(2.0, 0.6), new TurnToAngle(90)).schedule();
+    new SequentialCommandGroup(new DriveStraight(2.0, 0.6), new TurnToAngle(90))
+            .withTimeout(10.0).andThen(() -> drivetrain.setDutyCycles(0, 0)).schedule();
   }
 
   /**
@@ -100,7 +101,6 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
   }
 
   /**
