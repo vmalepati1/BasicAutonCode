@@ -13,6 +13,9 @@ public final class Constants {
         public static final int RIGHT_ENCODER_CHANNEL1 = 2;
         public static final int RIGHT_ENCODER_CHANNEL2 = 3;
 
+        public static final int INTAKE_LEFT_MOTOR_CHANNEL = 4;
+        public static final int INTAKE_RIGHT_MOTOR_CHANNEL = 5;
+
         public static final int SHIFTER_CHANNEL = 0;
 
     }

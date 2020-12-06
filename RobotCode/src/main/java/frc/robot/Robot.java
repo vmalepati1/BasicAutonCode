@@ -7,15 +7,19 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandGroupBase;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.commands.auton.ComplexAuto;
 import frc.robot.commands.auton.DriveStraight;
 import frc.robot.commands.auton.TurnToAngle;
 import frc.robot.commands.teleop.DriveCommand;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
+
+import java.util.function.DoubleSupplier;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -25,6 +29,7 @@ import frc.robot.subsystems.Drivetrain;
  */
 public class Robot extends TimedRobot {
   public static Drivetrain drivetrain;
+  private static Intake intake;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -33,6 +38,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     drivetrain = new Drivetrain();
+    intake = new Intake();
 
     SmartDashboard.putNumber("Drive Straight Heading P", 0.2);
     SmartDashboard.putNumber("Turn P", 0.05);
@@ -75,8 +81,20 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // Drives forward 2 meters and then turns 90 degrees
-    new SequentialCommandGroup(new DriveStraight(2.0, 0.6), new TurnToAngle(90))
-            .withTimeout(10.0).andThen(() -> drivetrain.setDutyCycles(0, 0)).schedule();
+    new SequentialCommandGroup(
+            // Intake cubes while driving
+            new ParallelDeadlineGroup(
+                    new DriveStraight(6.2, 0.8),
+                    new RunCommand(() -> intake.intake()).withTimeout()
+            ),
+            // Stop intaking
+            new InstantCommand(() -> intake.off()),
+            new WaitCommand(1),
+            new DriveStraight(13, -0.6),
+            new InstantCommand(() -> drivetrain.setDutyCycles(0, 0))
+    ).schedule();
+
+    // new ParallelRaceGroup(new DriveStraight(6.2, 0.8), new WaitCommand(5)).schedule();
   }
 
   /**

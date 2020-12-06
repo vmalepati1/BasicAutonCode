@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import static frc.robot.Robot.drivetrain;
 
 public class DriveStraight extends CommandBase {
-
     private double desiredDistance;
     private double power;
 
@@ -34,6 +33,11 @@ public class DriveStraight extends CommandBase {
 
         SmartDashboard.putNumber("Turn rate", turnRate);
         drivetrain.setArcadeSpeeds(power, turnRate);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        drivetrain.setDutyCycles(0, 0);
     }
 
     @Override
