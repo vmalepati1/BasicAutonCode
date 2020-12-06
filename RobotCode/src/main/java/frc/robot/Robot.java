@@ -85,7 +85,7 @@ public class Robot extends TimedRobot {
             // Intake cubes while driving
             new ParallelDeadlineGroup(
                     new DriveStraight(6.2, 0.8),
-                    new RunCommand(() -> intake.intake()).withTimeout()
+                    new RunCommand(() -> intake.intake())
             ),
             // Stop intaking
             new InstantCommand(() -> intake.off()),
